@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# PWA generated icons (keep SVG source)
+/public/icons/*.png
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

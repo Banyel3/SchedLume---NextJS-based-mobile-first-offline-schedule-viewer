@@ -1,0 +1,16 @@
+Subject,Day,Start,End,Room,Instructor
+Mathematics,Monday,9:00 AM,10:30 AM,Room 201,Dr. Smith
+Physics,Monday,11:00 AM,12:30 PM,Lab A,Prof. Johnson
+Computer Science,Monday,2:00 PM,3:30 PM,Lab B,Dr. Chen
+English Literature,Tuesday,9:00 AM,10:30 AM,Room 105,Ms. Davis
+History,Tuesday,11:00 AM,12:30 PM,Room 302,Prof. Wilson
+Chemistry,Tuesday,2:00 PM,4:00 PM,Lab C,Dr. Brown
+Mathematics,Wednesday,9:00 AM,10:30 AM,Room 201,Dr. Smith
+Art,Wednesday,11:00 AM,1:00 PM,Studio 1,Ms. Garcia
+Physical Education,Wednesday,3:00 PM,4:30 PM,Gymnasium,Coach Miller
+Physics,Thursday,9:00 AM,10:30 AM,Lab A,Prof. Johnson
+English Literature,Thursday,11:00 AM,12:30 PM,Room 105,Ms. Davis
+Computer Science,Thursday,2:00 PM,3:30 PM,Lab B,Dr. Chen
+Chemistry,Friday,9:00 AM,11:00 AM,Lab C,Dr. Brown
+History,Friday,11:30 AM,1:00 PM,Room 302,Prof. Wilson
+Music,Friday,2:00 PM,3:30 PM,Music Hall,Mr. Taylor
