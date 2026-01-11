@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { BottomNav } from "@/components/layout";
+import { BottomNav, MobileOnlyBlocker } from "@/components/layout";
 import { ServiceWorkerRegistration } from "@/components/pwa";
 
 export const metadata: Metadata = {
@@ -37,6 +37,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
       <body className="antialiased w-full">
+        <MobileOnlyBlocker />
         {/* Main content area with bottom padding for nav + safe area */}
         <div className="min-h-screen w-full pb-24 pb-safe">{children}</div>
         <BottomNav />
