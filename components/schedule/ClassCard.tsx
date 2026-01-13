@@ -44,12 +44,12 @@ export function ClassCard({
         />
 
         {/* Content Area */}
-        <div className="flex-1 pl-7 pr-5 py-5 sm:pl-8 sm:pr-6 sm:py-6">
-          <div className="flex justify-between items-start gap-4">
+        <div className="flex-1 py-5 sm:py-6 pr-5 sm:pr-6" style={{ marginLeft: '16px', paddingLeft: '12px' }}>
+          <div className="flex justify-between items-start gap-3">
             <div className="flex-1 min-w-0">
               {/* Time Row */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm font-medium text-gray-500 tracking-wide">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <span className="text-sm font-semibold text-gray-700 tracking-wide">
                   {formatTime(startTime, timeFormat)} - {formatTime(endTime, timeFormat)}
                 </span>
                 {(isCanceled || isOverridden || isAdded) && (
@@ -62,33 +62,36 @@ export function ClassCard({
               </div>
 
               {/* Subject Name */}
-              <div className="flex items-center gap-2 mb-3">
-                <h3 className={`text-xl font-bold text-gray-900 leading-tight truncate ${
-                  isCanceled ? "line-through decoration-gray-400" : ""
-                }`}>
+              <div className="flex items-start gap-2 mb-3">
+                <h3 
+                  className={`text-lg sm:text-xl font-bold text-gray-900 leading-snug ${
+                    isCanceled ? "line-through decoration-gray-400" : ""
+                  }`}
+                  style={{ wordWrap: 'break-word', overflowWrap: 'break-word', wordBreak: 'break-word' }}
+                >
                   {subjectName}
                 </h3>
-                {hasNote && <NoteDot size="md" className="translate-y-[1px]" />}
+                {hasNote && <NoteDot size="md" className="mt-1.5 shrink-0" />}
               </div>
 
               {/* Details Row */}
               {(location || professor) && (
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium text-gray-400">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-x-4 sm:gap-y-2 text-sm font-medium text-gray-600">
                   {location && (
-                    <span className="flex items-center gap-1.5 transition-colors group-hover:text-primary-400">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <span className="flex items-start gap-2 transition-colors group-hover:text-primary">
+                      <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
-                      {location}
+                      <span className="break-words">{location}</span>
                     </span>
                   )}
                   {professor && (
-                    <span className="flex items-center gap-1.5 transition-colors group-hover:text-primary-400">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <span className="flex items-start gap-2 transition-colors group-hover:text-primary">
+                      <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
-                      {professor}
+                      <span className="break-words">{professor}</span>
                     </span>
                   )}
                 </div>
