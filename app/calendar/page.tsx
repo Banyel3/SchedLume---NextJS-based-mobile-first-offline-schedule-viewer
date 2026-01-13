@@ -151,14 +151,14 @@ export default function CalendarPage() {
         title="Calendar"
         rightAction={
           !isToday(selectedDate) && (
-            <Button variant="ghost" size="sm" onClick={handleGoToToday}>
+            <Button variant="ghost" size="sm" onClick={handleGoToToday} className="text-primary font-medium">
               Today
             </Button>
           )
         }
       />
 
-      <main className="w-full px-4 sm:px-6 py-5">
+      <main className="w-full px-5 py-5 pb-28 animate-fade-in space-y-6">
         <CalendarGrid
           year={viewDate.year}
           month={viewDate.month}
@@ -172,102 +172,72 @@ export default function CalendarPage() {
           onNextMonth={handleNextMonth}
         />
 
-        {/* Selected date info */}
-        <div className="mt-4 p-5 bg-white rounded-2xl shadow-card">
-          <div className="flex items-center justify-between">
+        {/* Selected date preview container */}
+        <div className="bg-white rounded-3xl shadow-soft p-5 transition-all">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-medium text-gray-900">
+              <h3 className="text-xl font-bold text-gray-900 tracking-tight">
                 {formatDateDisplay(selectedDate)}
               </h3>
-              <div className="flex items-center gap-4 mt-2">
-                {datesWithNotes.has(selectedDate) && (
-                  <span className="text-xs text-amber-600 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                    Has class notes
-                  </span>
-                )}
-                {datesWithGeneralNotes.has(selectedDate) && (
-                  <span className="text-xs text-green-600 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                    Has notes
-                  </span>
-                )}
-                {datesWithOverrides.has(selectedDate) && (
-                  <span className="text-xs text-blue-600 flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
-                    Has changes
-                  </span>
-                )}
+              <div className="flex flex-wrap gap-3 mt-2">
+                 {/* Compact Legend / Status */}
+                 {datesWithNotes.has(selectedDate) && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-600 text-[11px] font-bold uppercase tracking-wider">
+                       Class Notes
+                    </span>
+                 )}
+                 {datesWithGeneralNotes.has(selectedDate) && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-green-50 text-green-600 text-[11px] font-bold uppercase tracking-wider">
+                       Notes
+                    </span>
+                 )}
+                 {datesWithOverrides.has(selectedDate) && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[11px] font-bold uppercase tracking-wider">
+                       Modified
+                    </span>
+                 )}
               </div>
             </div>
-            <Button onClick={handleViewDay} size="sm">
+            
+            <Button onClick={handleViewDay} className="bg-primary text-white rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl active:scale-95 transition-all">
               View Day
             </Button>
           </div>
-        </div>
+          
+          <div className="border-t border-gray-100 my-4" />
 
-        {/* General notes section */}
-        <div className="mt-4">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium text-gray-900">Notes</h4>
-            <Button variant="ghost" size="sm" onClick={handleAddNote}>
-              <svg
-                className="w-4 h-4 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Add Note
-            </Button>
-          </div>
-
-          {notesLoading ? (
-            <div className="py-8 text-center text-gray-400">Loading...</div>
-          ) : generalNotes.length === 0 ? (
-            <div className="py-8 text-center text-gray-400">
-              <p>No notes for this date</p>
-              <button
-                onClick={handleAddNote}
-                className="mt-2 text-primary-500 font-medium hover:underline"
-              >
-                Add your first note
+          {/* Notes Section within the card */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Tasks & Notes</h4>
+              <button onClick={handleAddNote} className="text-primary hover:text-primary-600 text-sm font-semibold flex items-center gap-1 transition-colors">
+                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                 </svg>
+                 Add
               </button>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {generalNotes.map((note) => (
-                <GeneralNoteCard
-                  key={note.id}
-                  note={note}
-                  onClick={() => handleEditNote(note)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Legend */}
-        <div className="px-1 py-5 text-sm text-gray-500">
-          <div className="flex items-center gap-6 flex-wrap">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-              <span>Class notes</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
-              <span>Notes</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
-              <span>Schedule changes</span>
-            </div>
+            {notesLoading ? (
+               <div className="py-8 text-center">
+                  <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+               </div>
+            ) : generalNotes.length === 0 ? (
+               <div className="py-6 text-center bg-surface-50 rounded-2xl border border-dashed border-gray-200">
+                  <p className="text-gray-400 text-sm">No notes allowed... just kidding.</p>
+                  <p className="text-gray-500 font-medium text-sm mt-1">Tap + to add a note.</p>
+               </div>
+            ) : (
+               <div className="space-y-3">
+                  {generalNotes.map((note) => (
+                    <GeneralNoteCard
+                      key={note.id}
+                      note={note}
+                      onClick={() => handleEditNote(note)}
+                    />
+                  ))}
+               </div>
+            )}
           </div>
         </div>
       </main>

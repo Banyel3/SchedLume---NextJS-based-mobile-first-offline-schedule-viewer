@@ -74,12 +74,12 @@ export function CalendarGrid({
   }, [year, month, emptyDaysAfter]);
 
   return (
-    <div className="bg-white rounded-2xl shadow-card overflow-hidden">
+    <div className="bg-white rounded-3xl shadow-soft p-2 overflow-hidden">
       {/* Month header */}
-      <div className="flex items-center justify-between px-6 py-5">
+      <div className="flex items-center justify-between px-4 py-4">
         <button
           onClick={onPrevMonth}
-          className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-xl hover:bg-surface-100 transition-colors"
+          className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary rounded-full hover:bg-surface-100 transition-all"
           aria-label="Previous month"
         >
           <svg
@@ -96,12 +96,12 @@ export function CalendarGrid({
             />
           </svg>
         </button>
-        <h2 className="text-lg font-semibold text-gray-900">
+        <h2 className="text-xl font-bold text-gray-900 tracking-tight">
           {formatMonthYear(year, month)}
         </h2>
         <button
           onClick={onNextMonth}
-          className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-xl hover:bg-surface-100 transition-colors"
+          className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-primary rounded-full hover:bg-surface-100 transition-all"
           aria-label="Next month"
         >
           <svg
@@ -121,11 +121,11 @@ export function CalendarGrid({
       </div>
 
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 border-b border-surface-200 px-4">
+      <div className="grid grid-cols-7 mb-2">
         {orderedDays.map((day) => (
           <div
             key={day}
-            className="py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wide"
+            className="py-2 text-center text-[11px] font-bold text-gray-400 uppercase tracking-wider"
           >
             {WEEKDAYS_SHORT[day]}
           </div>
@@ -133,7 +133,7 @@ export function CalendarGrid({
       </div>
 
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 p-3 gap-1">
+      <div className="grid grid-cols-7 gap-y-1 gap-x-1 sm:gap-x-2">
         {/* Previous month days (faded) */}
         {prevMonthDates.map((date) => (
           <DateCell
@@ -209,41 +209,23 @@ function DateCell({
   return (
     <button
       onClick={onClick}
-      className={`relative flex flex-col items-center justify-center h-11 rounded-lg transition-all ${
+      className={`relative flex flex-col items-center justify-center w-full aspect-square rounded-full transition-all duration-300 ${
         isSelected
-          ? "bg-primary-400 text-white shadow-sm"
+          ? "bg-primary text-white shadow-lg shadow-indigo-200 scale-100 font-bold"
           : isToday
-          ? "bg-primary-50 text-primary-600"
+          ? "bg-accent/20 text-indigo-900 font-semibold"
           : isCurrentMonth
           ? "text-gray-700 hover:bg-surface-100"
           : "text-gray-300 hover:bg-surface-50"
       }`}
     >
-      <span
-        className={`text-sm ${isSelected || isToday ? "font-semibold" : ""}`}
-      >
-        {dayNum}
-      </span>
+      <span className="text-sm z-10">{dayNum}</span>
 
-      {/* Indicators */}
-      <div className="flex items-center gap-0.5 mt-0.5 h-2">
-        {hasNote && (
-          <NoteDot size="sm" className={isSelected ? "bg-white" : ""} />
-        )}
-        {hasGeneralNote && (
-          <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              isSelected ? "bg-white/80" : "bg-green-400"
-            }`}
-          />
-        )}
-        {hasOverride && (
-          <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              isSelected ? "bg-white/80" : "bg-blue-400"
-            }`}
-          />
-        )}
+      {/* Indicators position absolute to avoid layout shift */}
+      <div className="absolute bottom-1.5 flex gap-0.5">
+         {(hasNote || hasGeneralNote || hasOverride) && (
+            <span className={`w-1 h-1 rounded-full ${isSelected ? "bg-white" : "bg-accent"}`} />
+         )}
       </div>
     </button>
   );

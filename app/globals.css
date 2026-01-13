@@ -1,38 +1,46 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Primary palette (coral/salmon) */
-  --color-primary-50: #fff8f5;
-  --color-primary-100: #ffeee8;
-  --color-primary-200: #ffd4c7;
-  --color-primary-300: #ffb5a0;
-  --color-primary-400: #f97b5c;
-  --color-primary-500: #e85d3a;
-  --color-primary-600: #d14420;
+  /* Primary palette (Deep Indigo) */
+  --color-primary-50: #e8e8fa;
+  --color-primary-100: #c6c4ea;
+  --color-primary-200: #a3a1db;
+  --color-primary-300: #817ecc;
+  --color-primary-400: #5f5abd;
+  /* Main Primary Color */
+  --color-primary: #2e2c78;
+  --color-primary-600: #252360;
+  --color-primary-700: #1c1a48;
+
+  /* Secondary/Accent palette (Warm Yellow) */
+  --color-accent: #ffc947;
+  --color-accent-hover: #ffb700;
 
   /* Surface palette */
   --color-surface-50: #ffffff;
-  --color-surface-100: #fafafa;
-  --color-surface-200: #f5f5f5;
-  --color-surface-300: #e5e5e5;
+  --color-surface-100: #f8f9fe; /* App Background */
+  --color-surface-200: #f4f5f7; /* Muted inputs */
+  --color-surface-300: #e4e7eb;
 
-  /* Shadows - softer, more modern */
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.08),
-    0 8px 24px rgba(0, 0, 0, 0.06);
-  --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-nav: 0 -1px 8px rgba(0, 0, 0, 0.04);
+  /* Text Colors */
+  --color-text-primary: #1a1c29;
+  --color-text-secondary: #8f9bb3;
 
-  /* Border radius */
+  /* Shadows - Soft & Modern */
+  --shadow-soft: 0 8px 24px rgba(149, 157, 165, 0.1);
+  --shadow-nav: 0 -4px 20px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.03);
+  --shadow-card-hover: 0 8px 16px rgba(46, 44, 120, 0.08);
+
+  /* Border radius (Squircles/Round) */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 20px;
-  --radius-card: 16px;
-  --radius-button: 12px;
-  --radius-full: 9999px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
 
-  /* Spacing scale (4px base) - comprehensive */
+  /* Spacing system */
   --spacing-1: 4px;
   --spacing-2: 8px;
   --spacing-3: 12px;
@@ -43,25 +51,10 @@
   --spacing-10: 40px;
   --spacing-12: 48px;
 
-  /* Legacy spacing aliases - renamed to avoid Tailwind conflicts */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 12px;
-  --space-lg: 16px;
-  --space-xl: 20px;
-  --space-xxl: 24px;
-  --space-xxxl: 32px;
-
   /* Layout constants */
-  --page-gutter: 24px;
-  --page-gutter-sm: 32px;
-  --page-max-width: 540px;
-  --header-height: 56px;
-  --bottom-nav-height: 72px;
-  --date-strip-height: 80px;
-  --touch-target-min: 48px;
-  --card-gap: 16px;
-  --section-gap: 24px;
+  --page-max-width: 480px; /* Mobile focused */
+  --header-height: 64px;
+  --bottom-nav-height: 80px;
 }
 
 * {
@@ -76,262 +69,75 @@ html {
 
 body {
   min-height: 100%;
-  background: linear-gradient(135deg, #fff8f5 0%, #ffeee8 100%);
-  color: #171717;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+  background-color: #f8f9fe;
+  color: #1a1c29;
+  font-family: var(--font-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Safe area padding for mobile */
+/* Safe area padding */
 .pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 20px);
 }
 
 .pt-safe {
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: env(safe-area-inset-top, 20px);
 }
 
-/* Hide scrollbar but keep functionality */
+/* Hide scrollbar */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 
-/* Custom focus styles */
+/* Focus styles */
 :focus-visible {
-  outline: 2px solid #f97b5c;
+  outline: 2px solid #2e2c78;
   outline-offset: 2px;
 }
 
-/* Button press effect */
-button:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-/* Smooth transitions */
-* {
-  transition-property: color, background-color, border-color, fill, stroke,
-    opacity, box-shadow, transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-/* Page transition */
-main {
-  animation: fadeIn 0.2s ease-out;
-}
-
+/* Animations */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Loading skeleton animation */
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Spin animation */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-/* Slide up animation for toasts/banners */
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .animate-slide-up {
-  animation: slideUp 0.3s ease-out;
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* =============================================================================
-   SPACING UTILITY CLASSES
-   ============================================================================= */
+/* Utility classes for new design system */
+.text-primary { color: #2e2c78; }
+.bg-primary { background-color: #2e2c78; }
 
-/* Page container with responsive padding */
-.page-container {
-  max-width: var(--page-max-width);
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--page-gutter);
-  padding-right: var(--page-gutter);
-  padding-top: var(--spacing-4);
-  padding-bottom: var(--spacing-8);
+.text-accent { color: #ffc947; }
+.bg-accent { background-color: #ffc947; }
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-@media (min-width: 640px) {
-  .page-container {
-    padding-left: var(--page-gutter-sm);
-    padding-right: var(--page-gutter-sm);
-    padding-top: var(--spacing-6);
-  }
-}
-
-/* Card list spacing */
-.card-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--card-gap);
-}
-
-/* Section list spacing */
-.section-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--section-gap);
-}
-
-/* Form field spacing */
-.form-fields {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-}
-
-/* =============================================================================
-   COMPONENT BASE STYLES
-   ============================================================================= */
-
-/* Section card */
-.section-card {
+/* Card base */
+.card-base {
   background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  overflow: hidden;
-}
-
-.section-card-header {
-  padding: var(--space-lg);
-  border-bottom: 1px solid var(--color-surface-200);
-}
-
-.section-card-content {
-  padding: var(--space-lg);
-}
-
-/* Class card */
-.class-card {
-  width: 100%;
-  text-align: left;
-  padding: var(--spacing-4);
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  border-left-width: 4px;
-  border-left-style: solid;
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
-}
-
-.class-card:hover {
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-1px);
-}
-
-.class-card:active {
-  transform: scale(0.99);
-}
-
-/* Input base */
-.input-base {
-  width: 100%;
-  height: var(--touch-target-min);
-  padding-left: var(--space-lg);
-  padding-right: var(--space-lg);
-  font-size: 16px; /* Prevents iOS zoom */
-  background: var(--color-surface-100);
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  transition: all 0.2s ease;
-}
-
-.input-base:focus {
-  outline: none;
-  border-color: var(--color-primary-400);
-  box-shadow: 0 0 0 3px rgba(249, 123, 92, 0.1);
-}
-
-/* Textarea base */
-.textarea-base {
-  width: 100%;
-  min-height: 160px;
-  padding: var(--space-lg);
-  font-size: 16px;
-  background: var(--color-surface-100);
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  resize: vertical;
-  transition: all 0.2s ease;
-}
-
-.textarea-base:focus {
-  outline: none;
-  border-color: var(--color-primary-400);
-  box-shadow: 0 0 0 3px rgba(249, 123, 92, 0.1);
-}
-
-/* Toggle button group */
-.toggle-group {
-  display: flex;
-  gap: var(--space-sm);
-}
-
-.toggle-button {
-  flex: 1;
-  padding: var(--space-sm) var(--space-md);
-  font-size: 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-surface-300);
-  background: transparent;
-  color: var(--color-gray-600);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.toggle-button:hover {
-  background: var(--color-surface-100);
-}
-
-.toggle-button.active {
-  background: var(--color-primary-50);
-  border-color: var(--color-primary-400);
-  color: var(--color-primary-700);
+  border-radius: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s, box-shadow 0.2s;
 }

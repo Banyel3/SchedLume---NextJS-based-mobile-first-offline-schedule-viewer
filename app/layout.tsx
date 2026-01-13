@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { BottomNav, MobileOnlyBlocker } from "@/components/layout";
 import { ServiceWorkerRegistration } from "@/components/pwa";
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "SchedLume - Class Schedule",
@@ -22,7 +29,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#F97B5C",
+  themeColor: "#2E2C78",
 };
 
 export default function RootLayout({
@@ -36,10 +43,10 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
-      <body className="antialiased w-full">
+      <body className={`${jakarta.className} antialiased w-full bg-[#F8F9FE]`}>
         <MobileOnlyBlocker />
         {/* Main content area with bottom padding for nav + safe area */}
-        <div className="min-h-screen w-full max-w-lg mx-auto pb-24 pt-4">{children}</div>
+        <div className="min-h-screen w-full max-w-md mx-auto pb-32 pt-6">{children}</div>
         <BottomNav />
         <ServiceWorkerRegistration />
       </body>

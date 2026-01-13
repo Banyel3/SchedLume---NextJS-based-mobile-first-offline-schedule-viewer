@@ -31,6 +31,7 @@ export default function SettingsPage() {
   const [exportingCSV, setExportingCSV] = useState(false);
   const [requestingPermission, setRequestingPermission] = useState(false);
 
+  // ... (Keep existing handlers mostly same, logic is fine)
   const handleImportSuccess = useCallback(() => {
     setToast({ message: "Schedule imported successfully!", type: "success" });
     refresh();
@@ -107,7 +108,6 @@ export default function SettingsPage() {
     async (enabled: boolean) => {
       try {
         if (enabled && !isNotificationPermissionGranted()) {
-          // Need to request permission first
           setRequestingPermission(true);
           const { permission } = await requestNotificationPermission();
           setRequestingPermission(false);
@@ -122,9 +122,7 @@ export default function SettingsPage() {
         }
 
         await updateSettings({ notificationsEnabled: enabled });
-        
         if (enabled) {
-          // Check for any pending reminders
           const count = await checkAndShowDueReminders();
           if (count > 0) {
             setToast({
@@ -176,327 +174,214 @@ export default function SettingsPage() {
     <>
       <AppHeader title="Settings" />
 
-      <main className="w-full px-4 sm:px-6 py-6 space-y-6 max-w-2xl mx-auto">
-        {/* Schedule Import Section */}
-        <section className="bg-white rounded-2xl shadow-card overflow-hidden">
-          <div className="px-6 py-5 sm:px-7 border-b border-surface-200/80">
-            <h2 className="font-semibold text-gray-900">Schedule</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Import your class schedule from a CSV file
-            </p>
+      <main className="w-full px-5 py-6 pb-28 space-y-6 max-w-2xl mx-auto animate-fade-in">
+        
+        {/* Section: Schedule */}
+        <div className="space-y-3">
+          <h2 className="px-1 text-sm font-bold text-gray-400 uppercase tracking-widest">Schedule</h2>
+          <div className="bg-white rounded-3xl shadow-sm overflow-hidden p-6 space-y-5">
+             <div className="space-y-4">
+               <div>
+                  <h3 className="text-gray-900 font-semibold mb-1">Import Schedule</h3>
+                  <p className="text-gray-500 text-sm mb-4">Upload a CSV file to populate your calendar</p>
+                  <CSVImporter onSuccess={handleImportSuccess} />
+               </div>
+               
+               <div className="pt-2 border-t border-gray-100 flex justify-center">
+                  <button onClick={handleDownloadTemplate} className="text-sm text-primary font-medium hover:underline">
+                     Download CSV Template
+                  </button>
+               </div>
+             </div>
+
+             {settings.lastImportedFileName && (
+               <div className="bg-surface-50 rounded-xl p-4 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                     <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                     </svg>
+                  </div>
+                  <div className="min-w-0">
+                     <p className="text-sm font-semibold text-gray-900 truncate">{settings.lastImportedFileName}</p>
+                     <p className="text-xs text-gray-500">
+                        Imported {settings.lastImportedAt && new Date(settings.lastImportedAt).toLocaleDateString()}
+                     </p>
+                  </div>
+               </div>
+             )}
           </div>
-          <div className="p-5 sm:p-6 space-y-5">
-            <CSVImporter onSuccess={handleImportSuccess} />
+        </div>
 
-            {/* Template download link */}
-            <div className="flex items-center justify-center gap-2 pt-2">
-              <button
-                onClick={handleDownloadTemplate}
-                className="text-sm text-primary-500 hover:text-primary-600 font-medium hover:underline"
-              >
-                Download CSV template
-              </button>
-            </div>
-
-            {settings.lastImportedFileName && (
-              <div className="mt-4 p-4 bg-surface-100 rounded-xl">
-                <p className="text-xs text-gray-500">Last import</p>
-                <p className="text-sm font-medium text-gray-700 mt-1">
-                  {settings.lastImportedFileName}
-                </p>
-                {settings.lastImportedAt && (
-                  <p className="text-xs text-gray-400 mt-1">
-                    {new Date(settings.lastImportedAt).toLocaleString()}
-                  </p>
-                )}
+        {/* Section: Preferences */}
+        <div className="space-y-3">
+           <h2 className="px-1 text-sm font-bold text-gray-400 uppercase tracking-widest">Preferences</h2>
+           <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+              {/* Week Start */}
+              <div className="p-5 border-b border-gray-50 flex items-center justify-between">
+                 <span className="font-semibold text-gray-900">Week Starts On</span>
+                 <div className="flex bg-surface-100 rounded-xl p-1">
+                    {(['monday', 'sunday'] as const).map((day) => (
+                       <button
+                          key={day}
+                          onClick={() => handleWeekStartChange(day)}
+                          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                             settings.weekStart === day 
+                             ? "bg-white text-gray-900 shadow-sm" 
+                             : "text-gray-500 hover:text-gray-700"
+                          }`}
+                       >
+                          {day === 'monday' ? 'Mon' : 'Sun'}
+                       </button>
+                    ))}
+                 </div>
               </div>
-            )}
-          </div>
-        </section>
 
-        {/* Data Management Section */}
-        <section className="bg-white rounded-2xl shadow-card overflow-hidden">
-          <div className="px-6 py-5 sm:px-7 border-b border-surface-200/80">
-            <h2 className="font-semibold text-gray-900">Data</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Export or clear your data
-            </p>
-          </div>
-          <div className="p-6 sm:p-7 space-y-4">
-            {/* Export schedule as CSV */}
-            <Button
-              variant="secondary"
-              className="w-full justify-between"
-              onClick={handleExportCSV}
-              disabled={exportingCSV}
-            >
-              <span>Export Schedule (CSV)</span>
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </Button>
+               {/* Time Format */}
+               <div className="p-5 flex items-center justify-between">
+                 <span className="font-semibold text-gray-900">Time Format</span>
+                 <div className="flex bg-surface-100 rounded-xl p-1">
+                    {(['12h', '24h'] as const).map((fmt) => (
+                       <button
+                          key={fmt}
+                          onClick={() => handleTimeFormatChange(fmt)}
+                          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                             settings.timeFormat === fmt 
+                             ? "bg-white text-gray-900 shadow-sm" 
+                             : "text-gray-500 hover:text-gray-700"
+                          }`}
+                       >
+                          {fmt}
+                       </button>
+                    ))}
+                 </div>
+              </div>
+           </div>
+        </div>
 
-            {/* Export full backup */}
-            <Button
-              variant="secondary"
-              className="w-full justify-between"
-              onClick={handleExport}
-              disabled={exporting}
-            >
-              <span>Export Full Backup (JSON)</span>
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
-            </Button>
-
-            {!showClearConfirm ? (
-              <Button
-                variant="ghost"
-                className="w-full justify-between text-red-500 hover:bg-red-50"
-                onClick={() => setShowClearConfirm(true)}
-              >
-                <span>Clear All Data</span>
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  />
-                </svg>
-              </Button>
-            ) : (
-              <div className="p-5 bg-red-50 rounded-xl space-y-4">
-                <p className="text-sm text-red-700">
-                  This will permanently delete all your schedules, notes, and
-                  settings. This action cannot be undone.
-                </p>
-                <div className="flex gap-3">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => setShowClearConfirm(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    className="flex-1"
-                    onClick={handleClearData}
-                    disabled={clearing}
-                  >
-                    {clearing ? "Clearing..." : "Delete Everything"}
-                  </Button>
+        {/* Section: Notifications */}
+        <div className="space-y-3">
+          <h2 className="px-1 text-sm font-bold text-gray-400 uppercase tracking-widest">Notifications</h2>
+          <div className="bg-white rounded-3xl shadow-sm overflow-hidden p-5 space-y-5">
+             <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-gray-900">Due Date Reminders</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">Alerts 3, 2, & 1 day before</p>
                 </div>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Preferences Section */}
-        <section className="bg-white rounded-2xl shadow-card overflow-hidden">
-          <div className="px-6 py-5 sm:px-7 border-b border-surface-200/80">
-            <h2 className="font-semibold text-gray-900">Preferences</h2>
-          </div>
-          <div className="p-6 sm:p-7 space-y-6">
-            {/* Week Start */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 block mb-3">
-                Week Starts On
-              </label>
-              <div className="flex gap-3">
                 <button
-                  onClick={() => handleWeekStartChange("sunday")}
-                  className={`flex-1 min-h-12 py-3 px-4 text-sm font-medium rounded-xl border transition-all active:scale-[0.98] ${
-                    settings.weekStart === "sunday"
-                      ? "bg-primary-50 border-primary-400 text-primary-700"
-                      : "border-surface-300 text-gray-600 hover:bg-surface-100"
-                  }`}
+                   onClick={() => handleNotificationToggle(!settings.notificationsEnabled)}
+                   className={`w-12 h-7 rounded-full transition-colors relative ${
+                      settings.notificationsEnabled ? "bg-primary" : "bg-gray-200"
+                   }`}
                 >
-                  Sunday
+                   <span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                      settings.notificationsEnabled ? "translate-x-6" : "translate-x-1"
+                   }`} />
                 </button>
-                <button
-                  onClick={() => handleWeekStartChange("monday")}
-                  className={`flex-1 min-h-12 py-3 px-4 text-sm font-medium rounded-xl border transition-all active:scale-[0.98] ${
-                    settings.weekStart === "monday"
-                      ? "bg-primary-50 border-primary-400 text-primary-700"
-                      : "border-surface-300 text-gray-600 hover:bg-surface-100"
-                  }`}
-                >
-                  Monday
-                </button>
-              </div>
-            </div>
+             </div>
 
-            {/* Time Format */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 block mb-3">
-                Time Format
-              </label>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleTimeFormatChange("12h")}
-                  className={`flex-1 min-h-12 py-3 px-4 text-sm font-medium rounded-xl border transition-all active:scale-[0.98] ${
-                    settings.timeFormat === "12h"
-                      ? "bg-primary-50 border-primary-400 text-primary-700"
-                      : "border-surface-300 text-gray-600 hover:bg-surface-100"
-                  }`}
-                >
-                  12-hour
-                </button>
-                <button
-                  onClick={() => handleTimeFormatChange("24h")}
-                  className={`flex-1 min-h-12 py-3 px-4 text-sm font-medium rounded-xl border transition-all active:scale-[0.98] ${
-                    settings.timeFormat === "24h"
-                      ? "bg-primary-50 border-primary-400 text-primary-700"
-                      : "border-surface-300 text-gray-600 hover:bg-surface-100"
-                  }`}
-                >
-                  24-hour
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Notifications Section */}
-        <section className="bg-white rounded-2xl shadow-card overflow-hidden">
-          <div className="px-6 py-5 sm:px-7 border-b border-surface-200/80">
-            <h2 className="font-semibold text-gray-900">Notifications</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Get reminders for notes with due dates
-            </p>
-          </div>
-          <div className="p-6 sm:p-7 space-y-6">
-            {/* Enable notifications toggle */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-gray-900">Due Date Reminders</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  Receive notifications 3, 2, and 1 day before due dates
-                </p>
-              </div>
-              <button
-                onClick={() => handleNotificationToggle(!settings.notificationsEnabled)}
-                disabled={requestingPermission}
-                className={`relative w-12 h-7 rounded-full transition-colors ${
-                  settings.notificationsEnabled ? "bg-primary-400" : "bg-gray-300"
-                } ${requestingPermission ? "opacity-50" : ""}`}
-              >
-                <span
-                  className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                    settings.notificationsEnabled ? "translate-x-6" : "translate-x-1"
-                  }`}
-                />
-              </button>
-            </div>
-
-            {/* Notification time preference */}
-            {settings.notificationsEnabled && (
-              <div>
-                <label className="text-sm font-medium text-gray-700 block mb-3">
-                  Reminder Time
-                </label>
-                <div className="flex gap-2">
-                  {(["08:00", "12:00", "18:00"] as const).map((time) => (
-                    <button
-                      key={time}
-                      onClick={() => handleNotificationTimeChange(time)}
-                      className={`flex-1 py-3 px-3 text-sm font-medium rounded-xl border transition-all ${
-                        settings.notificationTime === time
-                          ? "bg-primary-50 border-primary-400 text-primary-700"
-                          : "border-surface-300 text-gray-600 hover:bg-surface-100"
-                      }`}
-                    >
-                      {time === "08:00" ? "8 AM" : time === "12:00" ? "12 PM" : "6 PM"}
-                    </button>
-                  ))}
+             {settings.notificationsEnabled && (
+                <div className="pt-4 border-t border-gray-100">
+                   <label className="text-sm font-medium text-gray-700 mb-3 block">Reminder Time</label>
+                   <div className="grid grid-cols-3 gap-2">
+                      {(["08:00", "12:00", "18:00"] as const).map((time) => (
+                         <button
+                           key={time}
+                           onClick={() => handleNotificationTimeChange(time)}
+                           className={`py-2 px-2 rounded-xl text-sm font-medium border transition-all ${
+                              settings.notificationTime === time
+                              ? "border-primary bg-primary-50 text-primary-700"
+                              : "border-gray-200 text-gray-600 hover:bg-surface-50"
+                           }`}
+                         >
+                            {time === "08:00" ? "Morning" : time === "12:00" ? "Noon" : "Evening"}
+                         </button>
+                      ))}
+                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Permission status */}
-            {settings.notificationPermission === "denied" && (
-              <div className="p-4 bg-amber-50 rounded-xl">
-                <p className="text-sm text-amber-700">
-                  Notifications are blocked. Please enable them in your browser settings.
-                </p>
-              </div>
-            )}
+             )}
 
             {settings.notificationPermission === "default" && !settings.notificationsEnabled && (
-              <Button
-                variant="secondary"
-                className="w-full"
-                onClick={handleRequestPermission}
-                disabled={requestingPermission}
-              >
-                {requestingPermission ? "Requesting..." : "Enable Notifications"}
-              </Button>
+               <Button onClick={handleRequestPermission} disabled={requestingPermission} className="w-full">
+                  Enable Notifications
+               </Button>
             )}
           </div>
-        </section>
+        </div>
 
-        {/* About Section */}
-        <section className="bg-white rounded-2xl shadow-card overflow-hidden">
-          <div className="px-6 py-5 sm:px-7 border-b border-surface-200/80">
-            <h2 className="font-semibold text-gray-900">About</h2>
-          </div>
-          <div className="p-6 sm:p-7">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center">
-                <svg
-                  className="w-7 h-7 text-primary-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
-                  />
-                </svg>
+        {/* Section: Data & About */}
+        <div className="space-y-3">
+           <h2 className="px-1 text-sm font-bold text-gray-400 uppercase tracking-widest">Data & System</h2>
+           <div className="bg-white rounded-3xl shadow-sm overflow-hidden p-2">
+              <button 
+                onClick={handleExportCSV}
+                disabled={exportingCSV}
+                className="w-full p-4 flex items-center justify-between hover:bg-surface-50 rounded-2xl transition-colors text-left"
+              >
+                 <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                       </svg>
+                    </div>
+                    <span className="font-medium text-gray-700">Export Schedule (CSV)</span>
+                 </div>
+              </button>
+              
+              <button 
+                onClick={handleExport}
+                disabled={exporting}
+                className="w-full p-4 flex items-center justify-between hover:bg-surface-50 rounded-2xl transition-colors text-left"
+              >
+                 <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                       </svg>
+                    </div>
+                    <span className="font-medium text-gray-700">Backup All Data (JSON)</span>
+                 </div>
+              </button>
+
+              <button 
+                onClick={() => setShowClearConfirm(true)}
+                className="w-full p-4 flex items-center justify-between hover:bg-red-50 rounded-2xl transition-colors text-left group"
+              >
+                 <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-red-50 text-red-500 group-hover:bg-red-100 flex items-center justify-center transition-colors">
+                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                       </svg>
+                    </div>
+                    <span className="font-medium text-red-600">Clear All Data</span>
+                 </div>
+              </button>
+           </div>
+        </div>
+
+        {/* Clear Data Confirmation */}
+        {showClearConfirm && (
+           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4 animate-fade-in">
+              <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl">
+                 <h3 className="text-xl font-bold text-gray-900 mb-2">Delete everything?</h3>
+                 <p className="text-gray-500 mb-6"> This will permenantly delete all schedules, notes, and settings. This action cannot be undone.</p>
+                 <div className="flex gap-3">
+                    <Button variant="secondary" onClick={() => setShowClearConfirm(false)} className="flex-1">Cancel</Button>
+                    <Button variant="danger" disabled={clearing} onClick={handleClearData} className="flex-1">
+                       {clearing ? "Deleting..." : "Delete"}
+                    </Button>
+                 </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">SchedLume</h3>
-                <p className="text-sm text-gray-500">Version 1.0.0</p>
-              </div>
-            </div>
-            <p className="text-sm text-gray-500 mt-4">
-              A mobile-first, offline-capable class schedule viewer. Your data
-              is stored locally on your device.
-            </p>
-          </div>
-        </section>
+           </div>
+        )}
+
+        {/* Footer/About */}
+        <div className="text-center py-6">
+           <div className="inline-flex items-center gap-2 justify-center bg-white px-4 py-2 rounded-full shadow-sm mb-2">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"/>
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">SchedLume v1.0</span>
+           </div>
+           <p className="text-xs text-gray-400">Secure, offline, and yours.</p>
+        </div>
       </main>
 
       {/* Toast notifications */}
